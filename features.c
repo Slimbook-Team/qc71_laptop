@@ -22,9 +22,14 @@ struct oem_string_walker_data {
 
 static int __init slimbook_dmi_cb(const struct dmi_system_id *id)
 {
-	qc71_features.fn_lock      = true;
-	qc71_features.silent_mode  = true;
-	qc71_features.turbo_mode   = true;
+	qc71_features.fn_lock           = true;
+	qc71_features.silent_mode       = true;
+	qc71_features.turbo_mode        = true;
+	/* Slimbook EVO BIOS version string (e.g. "N.1.20GOS04") does not parse
+	 * as an integer >= 114, so the generic bios version check never enables
+	 * this flag. The charge control register (0x07B9) is present on all
+	 * Slimbook EVO models — enable it unconditionally for SLIMBOOK boards. */
+	qc71_features.batt_charge_limit = true;
 
 	return 1;
 }
