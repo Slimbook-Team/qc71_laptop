@@ -162,18 +162,18 @@ static int __init check_features_ec(void)
 	}
 
 	/*
-	 * A white-only keyboard reports itself in bit 0 of the keyboard
-	 * backlight status register; the brightness sits in bits 7:5 of the
-	 * same register, as on the single zone RGB keyboards.
+	 * White keyboards keep their level in bits 7:5 of the keyboard backlight
+	 * status register, as the single zone RGB ones do, but the EC has no bit
+	 * that tells them apart: bit 0 of that register follows the backlight
+	 * being on. So they are listed by EC project id.
 	 */
-	err = ec_read_byte(CTRL_2_ADDR);
+	err = ec_read_byte(PROJ_ID_ADDR);
 
 	if (err >= 0) {
-		pr_debug("keyboard backlight status byte: %#04x\n", err);
 		qc71_features.kbd_backlight_white = !qc71_features.kbd_backlight_rgb &&
-						    (err & CTRL_2_SINGLE_COLOR_KEYBOARD);
+						    err == PROJ_ID_SLIMBOOK_EXECUTIVE_14;
 	} else {
-		pr_warn("failed to query ctrl_2 byte: %d\n", err);
+		pr_warn("failed to query project id: %d\n", err);
 	}
 
 	return 0;
@@ -240,8 +240,8 @@ int __init qc71_check_features(void)
 	(void) check_features_bios();
 
 	/*
-	 * The white-only bit is confirmed on Slimbook hardware only; elsewhere
-	 * the LED has to be asked for with kbd_white=1.
+	 * The project ids above are Slimbook ones; elsewhere the LED has to be
+	 * asked for with kbd_white=1.
 	 */
 	if (!is_slimbook)
 		qc71_features.kbd_backlight_white = false;

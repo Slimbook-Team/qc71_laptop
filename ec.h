@@ -173,6 +173,7 @@
 #define PROJ_ID_CML_GAMING        15
 #define PROJ_ID_GK7NXXR           16
 #define PROJ_ID_GM5MU1Y           17
+#define PROJ_ID_SLIMBOOK_EXECUTIVE_14 26 /* white keyboard backlight */
 
 /* ========================================================================== */
 

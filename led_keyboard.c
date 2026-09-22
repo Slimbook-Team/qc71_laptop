@@ -21,7 +21,7 @@ static bool keyboard_white_led_registered;
 /* -1: detect from the EC, 0: never register, 1: always register */
 static int kbd_white = -1;
 module_param(kbd_white, int, 0444);
-MODULE_PARM_DESC(kbd_white, "white keyboard backlight: -1 detect on Slimbook (default), 0 off, 1 force; ignored on RGB keyboards");
+MODULE_PARM_DESC(kbd_white, "white keyboard backlight: -1 known Slimbook models (default), 0 off, 1 force; ignored on RGB keyboards");
 
 static uint kbd_white_max = 4;
 module_param(kbd_white_max, uint, 0444);
