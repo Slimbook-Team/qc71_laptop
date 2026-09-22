@@ -25,8 +25,11 @@ MODULE_PARM_DESC(show_charge_limit, "expose battery charge limit (default=false)
 
 /* ========================================================================== */
 
+static bool is_slimbook __initdata;
+
 static int __init slimbook_dmi_cb(const struct dmi_system_id *id)
 {
+	is_slimbook = true;
 	qc71_features.fn_lock           = true;
 	qc71_features.silent_mode       = true;
 	qc71_features.turbo_mode        = true;
@@ -158,6 +161,21 @@ static int __init check_features_ec(void)
 		pr_warn("failed to query support_2 byte: %d\n", err);
 	}
 
+	/*
+	 * A white-only keyboard reports itself in bit 0 of the keyboard
+	 * backlight status register; the brightness sits in bits 7:5 of the
+	 * same register, as on the single zone RGB keyboards.
+	 */
+	err = ec_read_byte(CTRL_2_ADDR);
+
+	if (err >= 0) {
+		pr_debug("keyboard backlight status byte: %#04x\n", err);
+		qc71_features.kbd_backlight_white = !qc71_features.kbd_backlight_rgb &&
+						    (err & CTRL_2_SINGLE_COLOR_KEYBOARD);
+	} else {
+		pr_warn("failed to query ctrl_2 byte: %d\n", err);
+	}
+
 	return 0;
 }
 
@@ -220,6 +238,13 @@ int __init qc71_check_features(void)
 {
 	(void) check_features_ec();
 	(void) check_features_bios();
+
+	/*
+	 * The white-only bit is confirmed on Slimbook hardware only; elsewhere
+	 * the LED has to be asked for with kbd_white=1.
+	 */
+	if (!is_slimbook)
+		qc71_features.kbd_backlight_white = false;
 
 	return 0;
 }

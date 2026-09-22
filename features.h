@@ -15,6 +15,7 @@ struct qc71_features_struct {
 	bool silent_mode       : 1; /* Slimbook silent mode: decreases fan rpm limit and tdp */
 	bool turbo_mode        : 1; /* Slimbook turbo mode */
 	bool kbd_backlight_rgb : 1;
+	bool kbd_backlight_white : 1; /* single colour, brightness only */
 };
 
 /* ========================================================================== */
