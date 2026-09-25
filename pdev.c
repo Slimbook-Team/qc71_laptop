@@ -433,6 +433,41 @@ static ssize_t custom_mode_show(struct device *dev,
 	return sprintf(buf, "%d\n", !!(status & CTRL_7_CUSTOM_MODE));
 }
 
+static ssize_t ac_auto_boot_show(struct device *dev,
+							   struct device_attribute *attr, char *buf)
+{
+
+	int status = ec_read_byte(CTRL_9_ADDR);
+
+	if (status < 0)
+		return status;
+
+	return (status & CTRL_9_AC_AUTO_BOOT_ENABLE) != 0;
+}
+
+static ssize_t ac_auto_boot_store(struct device *dev, struct device_attribute *attr,
+								const char *buf, size_t count)
+{
+	int status;
+	uint32_t value = 0;
+
+	if (kstrtouint(buf,0, &value))
+		return -EINVAL;
+
+	status = ec_read_byte(CTRL_9_ADDR);
+	if (status < 0)
+		return status;
+
+	status = SET_BIT(status, CTRL_9_AC_AUTO_BOOT_ENABLE, value == 1);
+
+	status = ec_write_byte(CTRL_9_ADDR, status);
+
+	if (status < 0)
+		return status;
+
+	return count;
+}
+
 /* ========================================================================== */
 
 static DEVICE_ATTR_RW(fn_lock);
@@ -446,6 +481,7 @@ static DEVICE_ATTR_RW(turbo_mode);
 static DEVICE_ATTR_RW(performance_mode);
 static DEVICE_ATTR_RW(custom_tdp);
 static DEVICE_ATTR_RO(custom_mode);
+static DEVICE_ATTR_RW(ac_auto_boot);
 
 static struct attribute *qc71_laptop_attrs[] = {
 	&dev_attr_fn_lock.attr,
@@ -459,6 +495,7 @@ static struct attribute *qc71_laptop_attrs[] = {
 	&dev_attr_performance_mode.attr,
 	&dev_attr_custom_tdp.attr,
 	&dev_attr_custom_mode.attr,
+	&dev_attr_ac_auto_boot.attr,
 	NULL
 };
 
