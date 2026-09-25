@@ -442,7 +442,7 @@ static ssize_t ac_auto_boot_show(struct device *dev,
 	if (status < 0)
 		return status;
 
-	return (status & CTRL_9_AC_AUTO_BOOT_ENABLE) != 0;
+	return sprintf(buf, "%d\n", ((status & CTRL_9_AC_AUTO_BOOT_ENABLE) != 0));
 }
 
 static ssize_t ac_auto_boot_store(struct device *dev, struct device_attribute *attr,
@@ -523,7 +523,9 @@ static umode_t qc71_laptop_attr_is_visible(struct kobject *kobj, struct attribut
 		ok = qc71_features.turbo_mode || qc71_features.silent_mode;
 	else if (attr == &dev_attr_custom_mode.attr)
 		ok = qc71_features.turbo_mode || qc71_features.silent_mode;
-
+	else if (attr == &dev_attr_ac_auto_boot.attr)
+		ok = true;
+		
 	return ok ? attr->mode : 0;
 }
 
