@@ -113,6 +113,7 @@ static int __init qc71_laptop_module_init(void)
 	if (qc71_features.silent_mode)       pr_cont(" silent-mode");
 	if (qc71_features.turbo_mode)        pr_cont(" turbo-mode");
 	if (qc71_features.kbd_backlight_rgb) pr_cont(" kbd-backlight-rgb");
+	if (qc71_features.kbd_backlight_white) pr_cont(" kbd-backlight-white");
 
 	pr_cont("\n");
 

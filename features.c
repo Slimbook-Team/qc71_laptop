@@ -25,8 +25,11 @@ MODULE_PARM_DESC(show_charge_limit, "expose battery charge limit (default=false)
 
 /* ========================================================================== */
 
+static bool is_slimbook __initdata;
+
 static int __init slimbook_dmi_cb(const struct dmi_system_id *id)
 {
+	is_slimbook = true;
 	qc71_features.fn_lock           = true;
 	qc71_features.silent_mode       = true;
 	qc71_features.turbo_mode        = true;
@@ -158,6 +161,21 @@ static int __init check_features_ec(void)
 		pr_warn("failed to query support_2 byte: %d\n", err);
 	}
 
+	/*
+	 * White keyboards keep their level in bits 7:5 of the keyboard backlight
+	 * status register, as the single zone RGB ones do, but the EC has no bit
+	 * that tells them apart: bit 0 of that register follows the backlight
+	 * being on. So they are listed by EC project id.
+	 */
+	err = ec_read_byte(PROJ_ID_ADDR);
+
+	if (err >= 0) {
+		qc71_features.kbd_backlight_white = !qc71_features.kbd_backlight_rgb &&
+						    err == PROJ_ID_SLIMBOOK_EXECUTIVE_14;
+	} else {
+		pr_warn("failed to query project id: %d\n", err);
+	}
+
 	return 0;
 }
 
@@ -220,6 +238,13 @@ int __init qc71_check_features(void)
 {
 	(void) check_features_ec();
 	(void) check_features_bios();
+
+	/*
+	 * The project ids above are Slimbook ones; elsewhere the LED has to be
+	 * asked for with kbd_white=1.
+	 */
+	if (!is_slimbook)
+		qc71_features.kbd_backlight_white = false;
 
 	return 0;
 }
