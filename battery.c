@@ -109,11 +109,7 @@ int __init qc71_battery_setup(void)
 {
 	if (nobattery || !qc71_features.batt_charge_limit)
 		return -ENODEV;
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(7, 2, 0)
-	acpi_battery_hook_register(&qc71_laptop_batt_hook);
-#else
 	battery_hook_register(&qc71_laptop_batt_hook);
-#endif
 	battery_hook_registered = true;
 
 	return 0;
@@ -121,13 +117,9 @@ int __init qc71_battery_setup(void)
 
 void qc71_battery_cleanup(void)
 {
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(7, 2, 0)
-	if (battery_hook_registered)
-		acpi_battery_hook_unregister(&qc71_laptop_batt_hook);
-#else
 	if (battery_hook_registered)
 		battery_hook_unregister(&qc71_laptop_batt_hook);
-#endif
+
 }
 
 #endif
