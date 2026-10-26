@@ -109,7 +109,7 @@ int __init qc71_battery_setup(void)
 {
 	if (nobattery || !qc71_features.batt_charge_limit)
 		return -ENODEV;
-	battery_hook_register(&qc71_laptop_batt_hook);
+	acpi_battery_hook_register(&qc71_laptop_batt_hook);
 	battery_hook_registered = true;
 
 	return 0;
@@ -118,7 +118,7 @@ int __init qc71_battery_setup(void)
 void qc71_battery_cleanup(void)
 {
 	if (battery_hook_registered)
-		battery_hook_unregister(&qc71_laptop_batt_hook);
+		acpi_battery_hook_unregister(&qc71_laptop_batt_hook);
 
 }
 
